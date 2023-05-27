@@ -12,6 +12,7 @@ contract LotterySystem is ERC721, Ownable, ReentrancyGuard {
     Counters.Counter public  ticketId;
 
     address public TheWinnerIs;
+    uint256 public winner_user_index;
 
     uint256 public TicketPrice=100;
     uint256 public PrizeAmount;
@@ -25,7 +26,7 @@ contract LotterySystem is ERC721, Ownable, ReentrancyGuard {
 
     function UserBuyTicket(address to) public payable nonReentrant {
         ticketId.increment();
-        LotteryNumber[counter+1] = to;
+        LotteryNumber[counter] = to;
         TicketId[to] = ticketId.current();
         _safeMint(to, ticketId.current());
         PrizeAmount += 100;
@@ -35,9 +36,9 @@ contract LotterySystem is ERC721, Ownable, ReentrancyGuard {
 
     function winner() public payable onlyOwner nonReentrant {
 
-        require(counter == 5,"Minimun 5 User Participate");
+        require(counter > 4,"Minimun 5 User Participate");
 
-        uint256 winner_user_index = (uint256(keccak256(abi.encodePacked(block.prevrandao, block.timestamp, counter)))) % counter;
+        winner_user_index = (uint256(keccak256(abi.encodePacked(block.prevrandao, block.timestamp, counter)))) % counter;
 
         TheWinnerIs = LotteryNumber[winner_user_index];
         
