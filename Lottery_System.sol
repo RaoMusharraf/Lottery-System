@@ -4,8 +4,9 @@ pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract LotterySystem is ERC721, Ownable {
+contract LotterySystem is ERC721, Ownable, ReentrancyGuard {
 
     using Counters for Counters.Counter;
     Counters.Counter public  ticketId;
@@ -22,7 +23,7 @@ contract LotterySystem is ERC721, Ownable {
 
     constructor() ERC721("LotteryTicket", "LTS") {}
 
-    function UserBuyTicket(address to) public payable {
+    function UserBuyTicket(address to) public payable nonReentrant {
         ticketId.increment();
         LotteryNumber[counter+1] = to;
         TicketId[to] = ticketId.current();
@@ -32,7 +33,7 @@ contract LotterySystem is ERC721, Ownable {
         counter += 1;
     }
 
-    function winner() public payable onlyOwner {
+    function winner() public payable onlyOwner nonReentrant {
 
         require(counter == 5,"Minimun 5 User Participate");
 
